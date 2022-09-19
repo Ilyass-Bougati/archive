@@ -1,11 +1,16 @@
 from crypt import methods
 from flask import *
+from flask_session import *
 from sys import argv
 from helpers import login_required
 
 # creating the app
 app = Flask(__name__)
 
+# the sessions
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
 
 # the main route
