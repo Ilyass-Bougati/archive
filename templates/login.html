@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+	login
+{% endblock %}
+
+{% block body %}
+	<div class="center">
+		<h1>Login</h1>
+		<form class="card" method="post" action="/login">
+			<div class="mb-3">
+
+				<label for="exampleInputEmail1" class="form-label">Email address</label>
+				<input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Email">
+				<div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+
+				<label for="exampleInputPassword1" class="form-label">Password</label>
+				<input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+
+			</div>
+
+            <button type="submit" class="btn btn-outline-primary">Login</button>
+
+			<p>Don't have and account? <a href="/register">Register.</a></p>
+		</form>
+	</div>
+{% endblock %}

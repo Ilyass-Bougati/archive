@@ -1,0 +1,28 @@
+.center {
+	margin: auto;
+	width: 500px;
+	margin-top: 40px;
+}
+
+form {
+	padding: 20px;
+	transition: all 0.5s ease;
+	box-shadow: 10px 10px 0px 3px rgba(0,0,0,0.21);
+	-webkit-box-shadow: 10px 10px 3px 0px rgba(0,0,0,0.21);
+	-moz-box-shadow: 10px 10px 3px 0px rgba(0,0,0,0.21);
+}
+
+form:hover {
+	box-shadow: 10px 10px 29px 0px rgba(0,0,0,0.21);
+	-webkit-box-shadow: 10px 10px 29px 0px rgba(0,0,0,0.21);
+	-moz-box-shadow: 10px 10px 29px 0px rgba(0,0,0,0.21);
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
