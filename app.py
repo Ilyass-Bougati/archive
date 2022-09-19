@@ -6,6 +6,8 @@ from helpers import login_required
 # creating the app
 app = Flask(__name__)
 
+
+
 # the main route
 @app.route("/")
 @login_required
@@ -29,9 +31,10 @@ def register():
     if request.method == "GET":
         return render_template("register.html")
 
+
     elif request.method == "POST":
         return "post"
-        
+
 
 if __name__ == "__main__":
     try:
