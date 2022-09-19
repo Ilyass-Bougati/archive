@@ -1,5 +1,6 @@
 from flask import *
 from functools import wraps
+import sqlite3
 
 
 def login_required(f):
@@ -13,3 +14,13 @@ def login_required(f):
             return redirect("/login")
         return f(*args, **kwargs)
     return decorated_function
+
+def connect(path="archive.db"):
+    try:
+        conn = sqlite3.connect(path)
+
+    except sqlite3.Error as err:
+        print(err)
+        conn = None
+    
+    return conn
