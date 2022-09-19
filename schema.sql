@@ -1,5 +1,6 @@
 CREATE TABLE users(
     id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL,
     password TEXT NOT NULL,
     token TEXT UNIQUE
