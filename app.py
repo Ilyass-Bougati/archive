@@ -4,9 +4,6 @@ from flask_session import *
 from sys import argv
 from helpers import *
 
-from secrets import token_hex
-TOKEN_LEN = 64
-
 # creating the app
 app = Flask(__name__)
 
@@ -20,21 +17,53 @@ Session(app)
 @app.route("/")
 @login_required
 def index():
-    return "Hello world"
+    return render_template("index.html")
 
 
 #the login route
 @app.route("/login", methods=["GET", "POST"])
+@nlogin_required
 def login():
     if request.method == "GET":
         return render_template("login.html")
 
     elif request.method == "POST":
-        return "post"
+
+
+        # getting the credentials
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # getting the user data
+        # Connecting to the database
+        conn = connect()
+        # getting the data
+        res = conn.execute("SELECT * FROM users WHERE username=?", [username]).fetchone()
+        print(res)
+        # checking if the user exists
+        if not res:
+            conn.close()
+            return render_template("login.html", Error="Password or username incorrect")
+        # checking if the passwords match
+        if Hash(password) != res[3]:
+            conn.close()
+            print("password shit")
+            return render_template("login.html", Error="Password or username incorrect")
+        
+        # generating token
+        token = generate_token(conn)
+
+        # changing the token in db
+        conn.execute("UPDATE users SET token=? WHERE username=?", [token, username])
+        session["token"] = token
+
+        # redirect
+        return redirect("/")
 
 
 # The registering route
 @app.route("/register", methods=["POST", "GET"])
+@nlogin_required
 def register():
     if request.method == "GET":
         return render_template("register.html")
@@ -71,16 +100,8 @@ def register():
             conn.close()
             return render_template("register.html", Error="Username already in use")
 
-        found_token = False
-        while not found_token:
-            # generatin a token
-            token = token_hex(TOKEN_LEN)
-            # checking if someone already has the token
-            res = conn.execute("SELECT id FROM users WHERE username=?", [username]).fetchone()
-            # regenerating token if token already exists
-            if not res:
-                found_token = True
-        
+        # generating token
+        token = generate_token(conn)
 
         # creating the user
         # inserting the user and giving session
@@ -92,6 +113,13 @@ def register():
         conn.close()
         return redirect("/")
 
+
+# logout route
+@app.route("/logout", methods=["POST"])
+@login_required
+def logout():
+    session.clear()
+    return redirect("/")
 
 
 if __name__ == "__main__":
