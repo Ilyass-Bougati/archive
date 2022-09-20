@@ -3,6 +3,8 @@ from flask import *
 from flask_session import *
 from sys import argv
 from helpers import *
+import os
+from werkzeug.utils import secure_filename
 
 # creating the app
 app = Flask(__name__)
@@ -120,6 +122,20 @@ def register():
 def logout():
     session.clear()
     return redirect("/")
+
+# the main route (The files route)
+@app.route("/files")
+@login_required
+def files():
+    return render_template("files.html")
+
+
+# The upload page
+@app.route("/upload", methods=["POST", "GET"])
+@login_required
+def upload():
+    if request.method == "GET":
+        return render_template("upload.html")
 
 
 if __name__ == "__main__":
