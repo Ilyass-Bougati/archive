@@ -6,6 +6,7 @@ from sys import argv
 from helpers import *
 import os
 from werkzeug.utils import secure_filename
+import time
 
 # creating the app
 app = Flask(__name__)
@@ -242,6 +243,44 @@ def download():
         return redirect("/")
 
     return send_file(f"{UPLOAD_FOLDER}/{res[1]}/{res[0]}", as_attachment=True)
+
+
+# The route to access an individual file
+@app.route("/file/<file_id>")
+@login_required
+def get_file(file_id):
+    # looking for the file in the database
+    # connecting to the database
+    conn = connect()
+    res = conn.execute("SELECT files.name, users.id, files.file_type FROM files JOIN users ON files.user_id=users.id WHERE files.id=? AND users.token=?", [file_id, session["token"]]).fetchone()
+
+    if not res:
+        return "file doesn't exist"
+
+    conn.close()
+
+    # getting the file data
+    file_path = f"{UPLOAD_FOLDER}/{res[1]}/{res[0]}"
+    size = os.path.getsize(file_path)
+    c_date = os.path.getctime(file_path)
+
+    # formatting the size
+    if size < 999999:
+        size = f"{size / 1000} Kb"
+    elif size < 999999999:
+        size = f"{size / 1000000} Mb"
+    else:
+        size = f"{size / 1000000000} Gb"
+
+    file_data = {
+        "name": ".".join(res[0].split(".")[0:-1]),
+        "size": size,
+        "creating_date": time.ctime(c_date),
+        "id": res[1],
+        "type": res[2]
+    }
+
+    return render_template("file.html", data=file_data) 
 
 
 if __name__ == "__main__":

@@ -1,0 +1,24 @@
+{% extends "layout2.html" %}
+
+{% block title %}
+    file ({{ data["name"] }})
+{% endblock %}
+
+{% block body %}
+<div class="card center" style="width: 80%;">
+    <div class="card-body">
+        <h3 class="card-title">{{ data["name"] }}</h3>
+        <h5 class="card-subtitle mb-2 text-muted">Type: {{ data["type"] }}</h5>
+        <h5 class="card-subtitle mb-2 text-muted">Creation date: {{ data["creating_date"] }}</h5>
+        <h5 class="card-subtitle mb-2 text-muted">Size: {{ data["size"] }}</h5>
+        <form method="post" action="/download" style="display: inline;">
+            <input type="text" name="id" value="{{ data['id'] }}" style="display: None;">
+            <button type="submit" class="btn btn-outline-primary">Download</button>
+        </form>
+        <form method="post" action="/delete" style="display: inline;">
+            <input type="text" name="id" value="{{ data['id'] }}" style="display: None;">
+            <button type="submit" class="btn btn-outline-danger">Delete</button>
+        </form>  
+    </div>
+</div>
+{% endblock %}
