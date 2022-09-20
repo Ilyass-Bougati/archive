@@ -36,7 +36,7 @@ Session(app)
 @app.route("/")
 @login_required
 def index():
-    return str(session["token"])
+    return redirect("/files")
 
 
 #the login route
@@ -144,6 +144,7 @@ def logout():
     session.clear()
     return redirect("/")
 
+
 # the main route (The files route)
 @app.route("/files")
 @login_required
@@ -151,8 +152,8 @@ def files():
     # getting all ther users files
     # connecting to the database
     conn = connect()
-    files = conn.execute("SELECT name FROM files JOIN users ON users.id = files.user_id WHERE users.token=?", [session["token"]]).fetchall()
-    return str(files)
+    files = conn.execute("SELECT name, files.id FROM files JOIN users ON users.id = files.user_id WHERE users.token=?", [session["token"]]).fetchall()
+    return render_template("files.html", files=files)
 
 
 # The upload page
@@ -199,6 +200,30 @@ def upload():
 
         return redirect("/")
         
+
+# delete a file route
+@app.route("/delete", methods=["POST"])
+@login_required
+def delete():
+    # getting the data
+    file_id = request.form.get("id")
+    # searching for the file in the database
+    # connecting to the database
+    conn = connect()
+    # searching the file while checking that the user have the permission to delete it
+    res = conn.execute("SELECT files.name, users.id FROM files JOIN users ON files.user_id = users.id WHERE users.token=? AND files.id=?", [session["token"], file_id]).fetchone()
+
+    if not res:
+        return redirect("/")
+    
+    # if everything is correct
+    conn.execute("DELETE FROM files WHERE id=?", [file_id])
+    conn.commit()
+    conn.close()
+    # delete from the disk
+    os.remove(f"{UPLOAD_FOLDER}/{res[1]}/{secure_filename(res[0])}")
+
+    return redirect("/files")
 
 
 if __name__ == "__main__":

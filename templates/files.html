@@ -1,0 +1,23 @@
+{% extends "layout2.html" %}
+
+{% block title %}
+    my files
+{% endblock %}
+
+{% block body %}
+    {% for file in files %}
+        <div class="card center" style="width: 500px;">
+            <div class="card-body">
+                <h5 class="card-title"><a href="/file/{{ file[1] }}" style="color: black;">{{ file[0] }}</a></h5>
+                <form method="post" action="/download" style="display: inline;">
+                    <input type="text" name="id" value="{{ file[1] }}" style="display: None;">
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Download</button>
+                </form>
+                <form method="post" action="/delete" style="display: inline;">
+                    <input type="text" name="id" value="{{ file[1] }}" style="display: None;">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                </form>    
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
