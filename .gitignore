@@ -1,3 +1,4 @@
 archive.db
 flask_session
 __pycache__
+data/*

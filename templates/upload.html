@@ -5,5 +5,10 @@
 {% endblock %}
 
 {% block body %}
-    
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="text" name="filename">
+    Select file:
+    <input type="file" name="file">
+    <input type="submit">
+</form>
 {% endblock %}

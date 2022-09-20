@@ -9,6 +9,22 @@ from werkzeug.utils import secure_filename
 # creating the app
 app = Flask(__name__)
 
+# creating the data file if it doesn't exist
+try:
+    os.mkdir("data")
+except FileExistsError:
+    print("Data file exists")
+
+# upload folder
+UPLOAD_FOLDER = os.getcwd() + "/data"
+ALLOWED_EXTENSIONS = {'mp4'}
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 # the sessions
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -136,6 +152,44 @@ def files():
 def upload():
     if request.method == "GET":
         return render_template("upload.html")
+
+    if request.method == "POST":
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return redirect(request.url)
+
+        # getting the data
+        file = request.files.get("file")
+        filename = request.form.get("filename") + "." + file.filename.split(".")[-1]
+
+        # checking the data
+        if not file.filename:
+            return render_template("upload.html", Error="You must choose a file")
+        if not filename:
+            filename = file.filename
+
+        # saving the file
+        # getting the user id
+        conn = connect()
+        user_id = conn.execute("SELECT id FROM users WHERE token=?", [session["token"]]).fetchone()[0]
+        user_directory = UPLOAD_FOLDER + f"/{user_id}" 
+
+        # make user directory
+        try:
+            os.mkdir(user_directory)
+        except FileExistsError:
+            pass
+
+        # adding the file to the database
+        conn.execute("INSERT INTO files (user_id, name) VALUES(?,?)", [user_id, filename])
+        file.save(os.path.join(user_directory, secure_filename(filename)))
+
+        #closing connection
+        conn.commit()
+        conn.close()
+
+        return redirect("/")
+        
 
 
 if __name__ == "__main__":
