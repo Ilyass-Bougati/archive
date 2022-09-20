@@ -226,6 +226,24 @@ def delete():
     return redirect("/files")
 
 
+# downloading files
+@app.route("/download", methods=["POST"])
+@login_required
+def download():
+    # getting the data
+    file_id = request.form.get("id")
+    # searching for the file in the database
+    # connecting to the database
+    conn = connect()
+    # searching the file while checking that the user have the permission to delete it
+    res = conn.execute("SELECT files.name, users.id FROM files JOIN users ON files.user_id = users.id WHERE users.token=? AND files.id=?", [session["token"], file_id]).fetchone()
+
+    if not res:
+        return redirect("/")
+
+    return send_file(f"{UPLOAD_FOLDER}/{res[1]}/{res[0]}", as_attachment=True)
+
+
 if __name__ == "__main__":
     try:
         debug = argv[1] == "debug"
