@@ -5,10 +5,17 @@
 {% endblock %}
 
 {% block body %}
+    {% if not files %}
+        <div class="center" style="width: 100px;">
+            <h5 style="color: gray;">
+                No files
+            </h5>
+        </div>
+    {% endif %}
     {% for file in files %}
         <div class="card center" style="width: 500px;">
             <div class="card-body">
-                <h5 class="card-title"><a href="/file/{{ file[1] }}" style="color: black;">{{ file[0] }}</a></h5>
+                <h5 class="card-title"><a href="/file/{{ file[1] }}" style="color: black;">{{ file[0].join(n.split(".")[0:-1]) }}</a></h5>
                 <form method="post" action="/download" style="display: inline;">
                     <input type="text" name="id" value="{{ file[1] }}" style="display: None;">
                     <button type="submit" class="btn btn-outline-primary btn-sm">Download</button>

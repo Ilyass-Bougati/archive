@@ -5,10 +5,17 @@
 {% endblock %}
 
 {% block body %}
-<form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="text" name="filename">
-    Select file:
-    <input type="file" name="file">
-    <input type="submit">
-</form>
+    <div class="center">
+        <form enctype="multipart/form-data" action="/upload" method="post">
+            <div class="mb-3">
+              <label  for="filename" class="form-label">File name</label>
+              <input type="text" class="form-control" name="filename">
+            </div>
+            <div class="mb-3">
+                <label for="formFile" class="form-label">The file</label>
+                <input class="form-control" type="file" id="formFile">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+    </div>
 {% endblock %}
