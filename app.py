@@ -1,4 +1,5 @@
 from crypt import methods
+from lib2to3.pgen2 import token
 from flask import *
 from flask_session import *
 from sys import argv
@@ -35,7 +36,7 @@ Session(app)
 @app.route("/")
 @login_required
 def index():
-    return render_template("index.html")
+    return str(session["token"])
 
 
 #the login route
@@ -74,6 +75,10 @@ def login():
         # changing the token in db
         conn.execute("UPDATE users SET token=? WHERE username=?", [token, username])
         session["token"] = token
+
+        # commiting and closing the connection
+        conn.commit()
+        conn.close()
 
         # redirect
         return redirect("/")
@@ -143,7 +148,11 @@ def logout():
 @app.route("/files")
 @login_required
 def files():
-    return render_template("files.html")
+    # getting all ther users files
+    # connecting to the database
+    conn = connect()
+    files = conn.execute("SELECT name FROM files JOIN users ON users.id = files.user_id WHERE users.token=?", [session["token"]]).fetchall()
+    return str(files)
 
 
 # The upload page
