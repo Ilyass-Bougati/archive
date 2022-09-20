@@ -152,7 +152,7 @@ def files():
     # getting all ther users files
     # connecting to the database
     conn = connect()
-    files = conn.execute("SELECT name, files.id FROM files JOIN users ON users.id = files.user_id WHERE users.token=?", [session["token"]]).fetchall()
+    files = conn.execute("SELECT name, files.id, files.file_type FROM files JOIN users ON users.id = files.user_id WHERE users.token=?", [session["token"]]).fetchall()
     return render_template("files.html", files=files)
 
 
@@ -191,7 +191,7 @@ def upload():
             pass
 
         # adding the file to the database
-        conn.execute("INSERT INTO files (user_id, name) VALUES(?,?)", [user_id, filename])
+        conn.execute("INSERT INTO files (user_id, name, file_type) VALUES(?,?,?)", [user_id, filename, file.content_type])
         file.save(os.path.join(user_directory, secure_filename(filename)))
 
         #closing connection

@@ -15,7 +15,8 @@
     {% for file in files %}
         <div class="card center" style="width: 500px;">
             <div class="card-body">
-                <h5 class="card-title"><a href="/file/{{ file[1] }}" style="color: black;">{{ file[0].join(n.split(".")[0:-1]) }}</a></h5>
+                <h5 class="card-title"><a href="/file/{{ file[1] }}" style="color: black;">{{ ".".join(file[0].split(".")[0:-1]) }}</a></h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ file[2] }}</h6>
                 <form method="post" action="/download" style="display: inline;">
                     <input type="text" name="id" value="{{ file[1] }}" style="display: None;">
                     <button type="submit" class="btn btn-outline-primary btn-sm">Download</button>

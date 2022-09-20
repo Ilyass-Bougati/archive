@@ -11,5 +11,6 @@ CREATE TABLE files(
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL,
     name TEXT NOT NULL,
+    file_type TEXT,
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
