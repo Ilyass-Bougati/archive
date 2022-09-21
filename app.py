@@ -7,6 +7,7 @@ from helpers import *
 import os
 from werkzeug.utils import secure_filename
 import time
+from waitress import serve
 
 # creating the app
 app = Flask(__name__)
@@ -284,9 +285,8 @@ def get_file(file_id):
 
 
 if __name__ == "__main__":
-    try:
-        debug = argv[1] == "debug"
-    except:
-        debug = False
+    if "debug" in argv:
+        app.run(debug=True)
+    else:
+        serve(app, host="0.0.0.0", port=8080)
 
-    app.run(debug=debug)
