@@ -16,7 +16,7 @@ app = Flask(__name__)
 try:
     os.mkdir("data")
 except FileExistsError:
-    print("Data file exists")
+    pass
 
 # upload folder
 UPLOAD_FOLDER = os.getcwd() + "/data"
@@ -60,7 +60,6 @@ def login():
         conn = connect()
         # getting the data
         res = conn.execute("SELECT * FROM users WHERE username=?", [username]).fetchone()
-        print(res)
         # checking if the user exists
         if not res:
             conn.close()
@@ -68,7 +67,6 @@ def login():
         # checking if the passwords match
         if Hash(password) != res[3]:
             conn.close()
-            print("password shit")
             return render_template("login.html", Error="Password or username incorrect")
         
         # generating token
