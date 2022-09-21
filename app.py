@@ -50,7 +50,6 @@ def login():
 
     elif request.method == "POST":
 
-
         # getting the credentials
         username = request.form.get("username")
         password = request.form.get("password")
@@ -59,7 +58,10 @@ def login():
         # Connecting to the database
         conn = connect()
         # getting the data
-        res = conn.execute("SELECT * FROM users WHERE username=?", [username]).fetchone()
+        try:
+            res = conn.execute("SELECT * FROM users WHERE username=?", [username]).fetchone()
+        except:
+            render_template("login.html", Error="Error login, try again later")
         # checking if the user exists
         if not res:
             conn.close()
@@ -73,7 +75,10 @@ def login():
         token = generate_token(conn)
 
         # changing the token in db
-        conn.execute("UPDATE users SET token=? WHERE username=?", [token, username])
+        try:
+            conn.execute("UPDATE users SET token=? WHERE username=?", [token, username])
+        except:
+            return render_template("login.html", Error="Error login, try again later")
         session["token"] = token
 
         # commiting and closing the connection
@@ -118,7 +123,10 @@ def register():
 
         # todo change this later
         # checking if the username is unique
-        res = conn.execute("SELECT id FROM users WHERE username=?", [username]).fetchone()
+        try:
+            res = conn.execute("SELECT id FROM users WHERE username=?", [username]).fetchone()
+        except:
+            return render_template("register.html", Error="Error registring, try again later")
         if res:
             conn.close()
             return render_template("register.html", Error="Username already in use")
@@ -128,7 +136,10 @@ def register():
 
         # creating the user
         # inserting the user and giving session
-        conn.execute("INSERT INTO users (username, email, password, token) VALUES(?, ?, ?, ?)", [username, email, Hash(password), token])
+        try:
+            conn.execute("INSERT INTO users (username, email, password, token) VALUES(?, ?, ?, ?)", [username, email, Hash(password), token])
+        except:
+            return render_template("register.html", Error="Error registring, try again later")
         session["token"] = token
         # committing the changes
         conn.commit()
@@ -152,7 +163,11 @@ def files():
     # getting all ther users files
     # connecting to the database
     conn = connect()
-    files = conn.execute("SELECT name, files.id, files.file_type FROM files JOIN users ON users.id = files.user_id WHERE users.token=?", [session["token"]]).fetchall()
+    try:
+        files = conn.execute("SELECT name, files.id, files.file_type FROM files JOIN users ON users.id = files.user_id WHERE users.token=?", [session["token"]]).fetchall()
+    except:
+        session.clear()
+        return render_template("login.html", Error="Server error, try again later")
     return render_template("files.html", files=files)
 
 
@@ -181,7 +196,10 @@ def upload():
         # saving the file
         # getting the user id
         conn = connect()
-        user_id = conn.execute("SELECT id FROM users WHERE token=?", [session["token"]]).fetchone()[0]
+        try:
+            user_id = conn.execute("SELECT id FROM users WHERE token=?", [session["token"]]).fetchone()[0]
+        except:
+            return redirect("/")
         user_directory = UPLOAD_FOLDER + f"/{user_id}" 
 
         # make user directory
@@ -191,7 +209,10 @@ def upload():
             pass
 
         # adding the file to the database
-        conn.execute("INSERT INTO files (user_id, name, file_type) VALUES(?,?,?)", [user_id, filename, file.content_type])
+        try:
+            conn.execute("INSERT INTO files (user_id, name, file_type) VALUES(?,?,?)", [user_id, filename, file.content_type])
+        except:
+            return redirect("/")
         file.save(os.path.join(user_directory, secure_filename(filename)))
 
         #closing connection
@@ -211,13 +232,19 @@ def delete():
     # connecting to the database
     conn = connect()
     # searching the file while checking that the user have the permission to delete it
-    res = conn.execute("SELECT files.name, users.id FROM files JOIN users ON files.user_id = users.id WHERE users.token=? AND files.id=?", [session["token"], file_id]).fetchone()
-
+    try:
+        res = conn.execute("SELECT files.name, users.id FROM files JOIN users ON files.user_id = users.id WHERE users.token=? AND files.id=?", [session["token"], file_id]).fetchone()
+    except:
+        return "Err"
     if not res:
         return redirect("/")
     
     # if everything is correct
-    conn.execute("DELETE FROM files WHERE id=?", [file_id])
+    try:
+        conn.execute("DELETE FROM files WHERE id=?", [file_id])
+    except:
+        return "Err"
+
     conn.commit()
     conn.close()
     # delete from the disk
@@ -236,7 +263,10 @@ def download():
     # connecting to the database
     conn = connect()
     # searching the file while checking that the user have the permission to delete it
-    res = conn.execute("SELECT files.name, users.id FROM files JOIN users ON files.user_id = users.id WHERE users.token=? AND files.id=?", [session["token"], file_id]).fetchone()
+    try:
+        res = conn.execute("SELECT files.name, users.id FROM files JOIN users ON files.user_id = users.id WHERE users.token=? AND files.id=?", [session["token"], file_id]).fetchone()
+    except:
+        return "Err"
 
     if not res:
         return redirect("/")
@@ -251,7 +281,10 @@ def get_file(file_id):
     # looking for the file in the database
     # connecting to the database
     conn = connect()
-    res = conn.execute("SELECT files.name, users.id, files.file_type FROM files JOIN users ON files.user_id=users.id WHERE files.id=? AND users.token=?", [file_id, session["token"]]).fetchone()
+    try:
+        res = conn.execute("SELECT files.name, users.id, files.file_type FROM files JOIN users ON files.user_id=users.id WHERE files.id=? AND users.token=?", [file_id, session["token"]]).fetchone()
+    except:
+        return "Err"
 
     if not res:
         return "file doesn't exist"
