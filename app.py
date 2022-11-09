@@ -319,5 +319,6 @@ if __name__ == "__main__":
     if "debug" in argv:
         app.run(debug=True)
     else:
-        serve(app, host="0.0.0.0", port=8080)
+        print("Running on: http://localhost:8080/")
+        serve(app, host="0.0.0.0", port=8080, max_request_body_size=10000000000)
 

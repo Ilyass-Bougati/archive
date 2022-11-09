@@ -1,0 +1,9 @@
+{
+    "configurations": [
+      {
+        "type": "python",
+        "name": "test",
+        "arguments": ["debug"],
+      }
+    ]
+}
