@@ -70,7 +70,7 @@ def login():
         if Hash(password) != res[3]:
             conn.close()
             return render_template("login.html", Error="Password or username incorrect")
-        
+
         # generating token
         token = generate_token(conn)
 
@@ -185,7 +185,7 @@ def upload():
 
         # getting the data
         file = request.files.get("file")
-        filename = request.form.get("filename") + "." + file.filename.split(".")[-1]
+        filename = request.form.get("filename").replace(" ", "_") + "." + file.filename.split(".")[-1]
 
         # checking the data
         if not file.filename:
@@ -200,7 +200,7 @@ def upload():
             user_id = conn.execute("SELECT id FROM users WHERE token=?", [session["token"]]).fetchone()[0]
         except:
             return redirect("/")
-        user_directory = UPLOAD_FOLDER + f"/{user_id}" 
+        user_directory = UPLOAD_FOLDER + f"/{user_id}"
 
         # make user directory
         try:
@@ -220,7 +220,7 @@ def upload():
         conn.close()
 
         return redirect("/")
-        
+
 
 # delete a file route
 @app.route("/delete", methods=["POST"])
@@ -238,7 +238,7 @@ def delete():
         return "Err"
     if not res:
         return redirect("/")
-    
+
     # if everything is correct
     try:
         conn.execute("DELETE FROM files WHERE id=?", [file_id])
@@ -312,7 +312,7 @@ def get_file(file_id):
         "type": res[2]
     }
 
-    return render_template("file.html", data=file_data) 
+    return render_template("file.html", data=file_data)
 
 
 if __name__ == "__main__":
@@ -321,11 +321,10 @@ if __name__ == "__main__":
     else:
         PORT = 5000
         MAX_REQUEST_BODY_SIZE = 100 * (1024**3) # 100GB
-        print(f"Running on: http://localhost/")
+        print(f"Running on: http://localhost:{PORT}/")
         serve(
-            app, 
-            host="0.0.0.0", 
-            port=PORT, 
+            app,
+            host="0.0.0.0",
+            port=PORT,
             max_request_body_size=MAX_REQUEST_BODY_SIZE
         )
-
