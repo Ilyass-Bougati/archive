@@ -297,12 +297,12 @@ def get_file(file_id):
     c_date = os.path.getctime(file_path)
 
     # formatting the size
-    if size < 999999:
-        size = f"{size / 1000} Kb"
-    elif size < 999999999:
-        size = f"{size / 1000000} Mb"
+    if size < 1024:
+        size = f"{size / 1024} Kb"
+    elif size < 1024**2:
+        size = f"{size / (1024**2)} Mb"
     else:
-        size = f"{size / 1000000000} Gb"
+        size = f"{size / (1024**3)} Gb"
 
     file_data = {
         "name": ".".join(res[0].split(".")[0:-1]),
@@ -319,6 +319,13 @@ if __name__ == "__main__":
     if "debug" in argv:
         app.run(debug=True)
     else:
-        print("Running on: http://localhost:8080/")
-        serve(app, host="0.0.0.0", port=8080, max_request_body_size=10000000000)
+        PORT = 5000
+        MAX_REQUEST_BODY_SIZE = 100 * (1024**3) # 100GB
+        print(f"Running on: http://localhost/")
+        serve(
+            app, 
+            host="0.0.0.0", 
+            port=PORT, 
+            max_request_body_size=MAX_REQUEST_BODY_SIZE
+        )
 
