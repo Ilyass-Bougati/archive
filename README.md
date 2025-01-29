@@ -7,7 +7,7 @@ you must install
 - Flask-session
 using the command
 ```bash
-pip install flask flask_session
+pip install -r requirements.txt
 ```
 Then you must create a database using the command
 ```bash
