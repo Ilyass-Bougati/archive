@@ -1,8 +1,8 @@
-# archive
+# Archive
 This application is a software that you can run on your old laptop or pc to turn it into an archive, I do not advise using it for anything serious.
 
 
-# Running the project 
+# Running the project
 ## Directly
 you only need to install the requirements the run the application
 
